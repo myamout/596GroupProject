@@ -1,5 +1,5 @@
 database.sqlite
-/bin/
-/include/
-/lib/
+/bin
+/include
+/lib
 pyenv.cfg
