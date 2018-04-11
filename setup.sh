@@ -1,4 +1,5 @@
 #!bin/bash
 python3 -m venv .
-pip3 install sklearn matplotlib numpy pandas
+source ./bin/activate
+pip install sklearn matplotlib numpy pandas scipy
 unzip database.sqlite.zip
