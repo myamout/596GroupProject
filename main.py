@@ -29,6 +29,9 @@ def main():
   players_attributes.attacking_work_rate.replace(["low", "medium", "high"], [1, 2, 3], inplace=True)
   players_attributes.defensive_work_rate.replace(["low", "medium", "high"], [1, 2, 3], inplace=True)
 
+  # Remove any rows with NaN
+  players_attributes = players_attributes.dropna()
+
   # Labels (overall_rating)
   labels = players_attributes["overall_rating"].values
   
@@ -40,24 +43,35 @@ def main():
   players_attributes.drop("date", axis=1, inplace=True)
   players_attributes.drop("potential", axis=1, inplace=True)
   players_attributes.drop("preferred_foot", axis=1, inplace=True)
+  players_attributes.drop("attacking_work_rate", axis=1, inplace=True)
+  players_attributes.drop("defensive_work_rate", axis=1, inplace=True)
 
+  # Prints out our row x column size
   print(players_attributes.shape)
 
   # We need to do more data clean up, some of the values are not ints or floats
   # THIS IS REALLY SLOW WE NEED TO FIX THIS!
-  for index, row in players_attributes.iterrows():
-    for key, value in row.items():
-      if isinstance(value, float) == False and isinstance(value, int) == False:
-        players_attributes.drop(players_attributes.index[index])
+
+  # for index, row in players_attributes.iterrows():
+  #   for key, value in row.items():
+  #     if type(value) == float or type(value) == int:
+  #       pass
+  #     else:
+  #       print(key)
+  
+  # Just the columns we want to use
+  feature_columns = ["attacking_work_rate", "defensive_work_rate", "crossing", "finishing", "heading_accuracy", "short_passing", "volleys", "dribbling", "curve", "free_kick_accuracy", "long_passing", "ball_control", "acceleration", "sprint_speed", "agility", "reactions", "balance", "shot_power", "jumping", "stamina", "strength", "long_shots", "aggression", "interceptions", "positioning", "vision", "penalties", "marking", "standing_tackle", "sliding_tackle", "gk_diving", "gk_handling", "gk_kicking", "gk_positioning", "gk_reflexes"]
+  # Remove any row that contains something other than an int or a float
   
   # Create our feature data
+
   features = players_attributes.iloc[:, :players_attributes.shape[1]-1]
 
   x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=5)
 
   lr = LinearRegression()
   model = lr.fit(x_train, y_train)
-  print(model.predict(x_test))
+  print(model.score(x_test, y_test))
 
 
 
