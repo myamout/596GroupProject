@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
 
 def main():
   connection = sqlite3.connect("database.sqlite")
@@ -32,16 +33,32 @@ def main():
   labels = players_attributes["overall_rating"].values
   
   # Drop shit we don't need
-  players_attributes.drop("overall_rating", axis=1)
-  players_attributes.drop("id", axis=1)
-  players_attributes.drop("player_fifa_api_id", axis=1)
-  players_attributes.drop("player_api_id", axis=1)
-  players_attributes.drop("date", axis=1)
-  players_attributes.drop("potential", axis=1)
-  players_attributes.drop("preferred_foot", axis=1)
+  players_attributes.drop("overall_rating", axis=1, inplace=True)
+  players_attributes.drop("id", axis=1, inplace=True)
+  players_attributes.drop("player_fifa_api_id", axis=1, inplace=True)
+  players_attributes.drop("player_api_id", axis=1, inplace=True)
+  players_attributes.drop("date", axis=1, inplace=True)
+  players_attributes.drop("potential", axis=1, inplace=True)
+  players_attributes.drop("preferred_foot", axis=1, inplace=True)
+
+  print(players_attributes.shape)
+
+  # We need to do more data clean up, some of the values are not ints or floats
+  # THIS IS REALLY SLOW WE NEED TO FIX THIS!
+  for index, row in players_attributes.iterrows():
+    for key, value in row.items():
+      if isinstance(value, float) == False and isinstance(value, int) == False:
+        players_attributes.drop(players_attributes.index[index])
   
   # Create our feature data
-  print(players_attributes[:5])
+  features = players_attributes.iloc[:, :players_attributes.shape[1]-1]
+
+  x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=5)
+
+  lr = LinearRegression()
+  model = lr.fit(x_train, y_train)
+  print(model.predict(x_test))
+
 
 
 if __name__ == '__main__':
