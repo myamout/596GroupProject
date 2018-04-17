@@ -3,7 +3,6 @@ import sqlite3
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
-from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
@@ -65,12 +64,13 @@ def main():
   model = lr.fit(x_train, y_train)
   print(model.score(x_test, y_test))
   # Print out more stats for the linear method
-  # Try using SVM and Neural Network to see which will produce better results?
+  # Try using Neural Network or some other model for better results?
 
   # Neural Networks
   mlr = MLPRegressor(hidden_layer_sizes=100, activation="tanh", solver="adam", learning_rate_init=0.001)
   fnn_model = mlr.fit(x_train, y_train)
   print(fnn_model.score(x_test, y_test))
+
 
 
 
