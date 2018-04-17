@@ -2,6 +2,8 @@ import pandas as pd
 import sqlite3
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.neural_network import MLPRegressor
+from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
@@ -32,8 +34,8 @@ def main():
   # Remove any rows with NaN
   players_attributes = players_attributes.dropna()
 
-  # Labels (overall_rating)
-  labels = players_attributes["overall_rating"].values
+  # Labels (potential)
+  labels = players_attributes["potential"].values
   
   # Drop shit we don't need
   players_attributes.drop("overall_rating", axis=1, inplace=True)
@@ -48,16 +50,6 @@ def main():
 
   # Prints out our row x column size
   print(players_attributes.shape)
-
-  # We need to do more data clean up, some of the values are not ints or floats
-  # THIS IS REALLY SLOW WE NEED TO FIX THIS!
-
-  # for index, row in players_attributes.iterrows():
-  #   for key, value in row.items():
-  #     if type(value) == float or type(value) == int:
-  #       pass
-  #     else:
-  #       print(key)
   
   # Just the columns we want to use
   feature_columns = ["attacking_work_rate", "defensive_work_rate", "crossing", "finishing", "heading_accuracy", "short_passing", "volleys", "dribbling", "curve", "free_kick_accuracy", "long_passing", "ball_control", "acceleration", "sprint_speed", "agility", "reactions", "balance", "shot_power", "jumping", "stamina", "strength", "long_shots", "aggression", "interceptions", "positioning", "vision", "penalties", "marking", "standing_tackle", "sliding_tackle", "gk_diving", "gk_handling", "gk_kicking", "gk_positioning", "gk_reflexes"]
@@ -72,6 +64,13 @@ def main():
   lr = LinearRegression()
   model = lr.fit(x_train, y_train)
   print(model.score(x_test, y_test))
+  # Print out more stats for the linear method
+  # Try using SVM and Neural Network to see which will produce better results?
+
+  # Neural Networks
+  mlr = MLPRegressor(hidden_layer_sizes=100, activation="tanh", solver="adam", learning_rate_init=0.001)
+  fnn_model = mlr.fit(x_train, y_train)
+  print(fnn_model.score(x_test, y_test))
 
 
 
