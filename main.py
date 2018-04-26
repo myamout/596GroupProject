@@ -8,7 +8,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, mean_absolute_error, r2_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
@@ -69,7 +69,46 @@ def main():
   # print(model.score(x_test, y_test))
   # Print out more stats for the linear method
   # Try using Neural Network or some other model for better results?
+  #####################################################################################
+  ALPHA = 0.19
+  theta = np.zeros(34)
+  MAX_ITER = 1500
+  sc = MinMaxScaler() #Standardizing dataset
+  sc.fit(x_train,x_test)
+  x_train_std = sc.transform(x_train) #Transforming the dataset to fit the gradient descent
+  x_test_std = sc.transform(x_test)
+  xvalues = np.ones((59517,34))
+  xvalues[:,1:34] = x_test_std[:,0:33]
+  def gradientDescent(X, y, theta, alpha, numIterations):
+    m = len(y)
+    arrCost =[]
+    transposedX = np.transpose(X)
+    transposedTheta = np.transpose(theta)
+    for iteration in range(0, numIterations):
+        guess = np.dot(X,theta)
+        residualError = guess - y
+        gradient = np.dot(transposedX,residualError) / m
+        change = [alpha * x for x in gradient]
+        theta = np.subtract(theta, change)
+        atmp = np.sum(residualError ** 2)/(2*m)
+        arrCost.append(atmp)
+    return theta, arrCost
+  
+  [theta, arrCost] = gradientDescent(x_test_std,y_test,theta,ALPHA,MAX_ITER)
 
+  plt.plot(range(0,len(arrCost)),arrCost)
+  plt.xlabel('iteration')
+  plt.ylabel('cost')
+  plt.title('Convergence Curve')
+  plt.show()
+
+  testXValues = np.ones((len(x_test_std), 34)) 
+  testXValues[:, 1:3] = x_test_std[:, 0:2]
+  tVal =  testXValues.dot(theta)
+  
+  tError = np.sqrt([x**2 for x in np.subtract(tVal, x_test_std[:, 2])])
+  print('results: {} ({})'.format(round(np.mean(tError),2), round(np.std(tError),2)))
+  #############################################################################
   #Neural Networks
   mlpr = MLPRegressor(hidden_layer_sizes=100, activation="relu", solver="adam", learning_rate_init=0.0001)
   fnn_model = mlpr.fit(x_train, y_train)
