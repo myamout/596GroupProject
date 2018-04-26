@@ -1,10 +1,13 @@
 import pandas as pd
 import sqlite3
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor, MLPClassifier
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, mean_absolute_error
+from sklearn.metrics import accuracy_score, confusion_matrix, mean_absolute_error, r2_score
 from sklearn.preprocessing import LabelEncoder
 
 from sklearn import metrics
@@ -49,8 +52,7 @@ def main():
 
 
   # Prints out our row x column size
-  print(players_attributes.shape)
-
+  # print(players_attributes.shape)
   # Just the columns we want to use
   # feature_columns = ["overall_rating", "attacking_work_rate", "defensive_work_rate", "crossing", "finishing", "heading_accuracy", "short_passing", "volleys", "dribbling", "curve", "free_kick_accuracy", "long_passing", "ball_control", "acceleration", "sprint_speed", "agility", "reactions", "balance", "shot_power", "jumping", "stamina", "strength", "long_shots", "aggression", "interceptions", "positioning", "vision", "penalties", "marking", "gk_reflexes", "gk_positioning", "gk_kicking", "gk_handling", "gk_diving"]
   # Remove any row that contains something other than an int or a float
@@ -62,7 +64,6 @@ def main():
 
   x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=5)
 
-  # print(y_test)
   # lr = LinearRegression()
   # model = lr.fit(x_train, y_train)
   # print(model.score(x_test, y_test))
@@ -87,6 +88,26 @@ def main():
   plt.title('Accuracy')
   plt.xlabel('Predictions')
   plt.ylabel('Actual Values')
+  plt.show()
+
+  kn = KNeighborsRegressor(n_neighbors=12, weights='distance', n_jobs=-1)
+  kn_model = kn.fit(x_train, y_train)
+  y_pred = kn_model.predict(x_test)
+
+  mean_error = mean_absolute_error(y_test, y_pred)
+  kn_score = r2_score(y_test, y_pred)
+
+  print("K Nearest Neighbors Regression")
+  print("Accuracy: {}".format(kn_score))
+  print("Mean Error: {}".format(mean_error))
+
+  ax = plt.subplot(111)
+  plt.scatter(y_pred, y_test, c='r', marker='x')
+  plt.plot(x_test, x_test, 'b', lw=1)
+  plt.ylim(ymin=30)
+  plt.xlim(xmin=30)
+  plt.xlabel('Red: Y Predictions, Blue: X Tests')
+  plt.ylabel('Red: Y Tests, Blue: X Tests')
   plt.show()
 
 
