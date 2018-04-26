@@ -72,6 +72,7 @@ def main():
   #Neural Networks
   mlpr = MLPRegressor(hidden_layer_sizes=100, activation="relu", solver="adam", learning_rate_init=0.0001)
   fnn_model = mlpr.fit(x_train, y_train)
+  print("FNN - MLPRegressor")
   print("Accuracy: ", fnn_model.score(x_test, y_test))
   y_pred = fnn_model.predict(x_test)
   error = mean_absolute_error(y_pred, y_test)
