@@ -71,7 +71,7 @@ def main():
   # fnn_model = mlr.fit(x_train, y_train)
   # print(fnn_model.score(x_test, y_test))
 
-  kn = KNeighborsRegressor(n_neighbors=5, weights='distance', n_jobs=-1)
+  kn = KNeighborsRegressor(n_neighbors=12, weights='distance', n_jobs=-1)
   kn_model = kn.fit(x_train, y_train)
   y_pred = kn_model.predict(x_test)
 
