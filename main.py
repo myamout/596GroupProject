@@ -19,57 +19,32 @@ def main():
   connection = sqlite3.connect("database.sqlite")
   cursor = connection.cursor()
 
-  # grab all of the players
-  cursor.execute("SELECT * FROM Player")
-  players = pd.DataFrame(cursor.fetchall(),
-    columns=["id", "player_api_id", "player_name", "player_fifa_api_id", "birthday", "height", "weight"])
-
-  # grab all of the players' attributes
+  # grab all of the players' attributes from the sqlite3 database
   cursor.execute("SELECT * FROM Player_Attributes")
   players_attributes = pd.DataFrame(cursor.fetchall(),
     columns=["id", "player_fifa_api_id", "player_api_id", "date", "overall_rating", "potential", "preferred_foot", "attacking_work_rate", "defensive_work_rate", "crossing", "finishing", "heading_accuracy", "short_passing", "volleys", "dribbling", "curve", "free_kick_accuracy", "long_passing", "ball_control", "acceleration", "sprint_speed", "agility", "reactions", "balance", "shot_power", "jumping", "stamina", "strength", "long_shots", "aggression", "interceptions", "positioning", "vision", "penalties", "marking", "standing_tackle", "sliding_tackle", "gk_diving", "gk_handling", "gk_kicking", "gk_positioning", "gk_reflexes"])
 
-  # I'm not sure we even need the players_dataframe
-  # we'll see
-
-  # replace attacking work rate and defensive work rate with numbers
-  # 1 = low, 2 = medium, 3 = high
-  # These steps are kinda repeatative, we can fix this
-  # players_attributes.attacking_work_rate.replace(["low", "medium", "high"], [1, 2, 3], inplace=True)
-  # players_attributes.defensive_work_rate.replace(["low", "medium", "high"], [1, 2, 3], inplace=True)
-
   # Remove any rows with NaN
   players_attributes = players_attributes.dropna()
 
-  # Labels (potential)
+  # Labels (overall rating)
   labels = players_attributes["overall_rating"].values
 
-  # Drop shit we don't need
+  # create a list on the individual attributes that we aren't going to use as features
   drop_list = ["id", "player_fifa_api_id", "player_api_id", "date", "overall_rating", "preferred_foot", "attacking_work_rate", "defensive_work_rate", ]
 
+  # Drop everything
   for attribute in drop_list:
     players_attributes.drop(attribute, axis=1, inplace=True)
 
-
-  # Prints out our row x column size
-  # print(players_attributes.shape)
-  # Just the columns we want to use
-  # feature_columns = ["overall_rating", "attacking_work_rate", "defensive_work_rate", "crossing", "finishing", "heading_accuracy", "short_passing", "volleys", "dribbling", "curve", "free_kick_accuracy", "long_passing", "ball_control", "acceleration", "sprint_speed", "agility", "reactions", "balance", "shot_power", "jumping", "stamina", "strength", "long_shots", "aggression", "interceptions", "positioning", "vision", "penalties", "marking", "gk_reflexes", "gk_positioning", "gk_kicking", "gk_handling", "gk_diving"]
-  # Remove any row that contains something other than an int or a float
-
   # Create our feature data
-
   features = players_attributes.iloc[:, :players_attributes.shape[0]-1]
-  # print(features)
 
+  # Use Sklearn to create our training and testing datasets
   x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=5)
 
-  # lr = LinearRegression()
-  # model = lr.fit(x_train, y_train)
-  # print(model.score(x_test, y_test))
-  # Print out more stats for the linear method
-  # Try using Neural Network or some other model for better results?
-  #####################################################################################
+  ######################
+  # Gradient Descent Model
   ALPHA = 0.19
   theta = np.zeros(34)
   MAX_ITER = 1500
@@ -129,6 +104,8 @@ def main():
   plt.ylabel('Actual Values')
   plt.show()
 
+  ####################
+  # K Nearest Neighbor Model
   kn = KNeighborsRegressor(n_neighbors=12, weights='distance', n_jobs=-1)
   kn_model = kn.fit(x_train, y_train)
   y_pred = kn_model.predict(x_test)
